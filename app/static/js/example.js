@@ -1,0 +1,134 @@
+﻿var map;
+var greenIcon;
+var redIcon;
+
+function init() {
+    map = L.map('map', {
+        center: [52.0, -11.0],
+        zoom: 5,
+        layers: [
+            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            })
+        ]
+    });
+
+    greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    redIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+}
+
+function drawPolyline(points) {
+    var coordinates = [];
+    points.forEach(function (point) {
+        coordinates.push([point.latitude, point.longitude]);
+        var marker = new L.marker([point.latitude, point.longitude]);
+        marker.bindTooltip(point.ip, { permanent: true, className: "my-label", offset: [0, 0] });
+        marker.addTo(map);
+    });
+
+    var arrow = L.polyline(coordinates, {}).addTo(map);
+    var arrowHead = L.polylineDecorator(arrow, {
+        patterns: [
+            { offset: 25, repeat: 50, symbol: L.Symbol.arrowHead({ pixelSize: 15, pathOptions: { fillOpacity: 1, weight: 0 } }) }
+        ]
+    }).addTo(map);
+
+    L.marker(coordinates.shift(), { icon: greenIcon }).addTo(map);
+    L.marker(coordinates.pop(), { icon: redIcon }).addTo(map);
+
+    map.fitBounds(arrow.getBounds());
+}
+
+function drawRandomLine() {
+    fetch('https://ipapi.co/json/')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    dataOk = data.location_list;
+                    console.log(dataOk)
+                    var tempArray = [];
+                    dataOk.forEach(function (arrayItem) {
+                        tempArray.push({
+                            ip: arrayItem.ip,
+                            latitude: arrayItem.location.latitude,
+                            longitude: arrayItem.location.longitude
+                        });
+                    });
+                    drawPolyline(tempArray);
+                });
+        });
+
+
+
+    var points = [
+        {
+            latitude: 48,
+            longitude: 2,
+            ip: "142.234.21.21"
+        },
+        {
+            latitude: 47.7,
+            longitude: 2.1,
+            ip: "191.1.0.3"
+        },
+        {
+            latitude: 47.65,
+            longitude: 2.4,
+            ip: "192.168.1.0"
+        },
+        {
+            latitude: 47.4,
+            longitude: 2.5,
+            ip: "127.0.0.1"
+        }
+    ];
+
+}
+
+function traceroute() {
+
+
+    drawRandomLine()
+
+    console.log(getIpAdress())
+}
+
+class Point {
+    constructor(longitude, latitude, ip) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.ip = ip;
+    }
+}
+
+
+function getIpAdress() {
+    fetch('https://ipapi.co/json/')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            console.log(data.ip);
+        });
+}
