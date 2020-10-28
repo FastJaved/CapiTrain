@@ -34,12 +34,32 @@ function init() {
 
 function drawPolyline(points) {
     var coordinates = [];
+
+    var ipByPosition = new Map();
+    var positionByKey = new Map();
+
     points.forEach(function (point) {
+        position = getPosition(point);
+        if (!ipByPosition.has(position)) {
+            ipByPosition.set(position, []);
+        }
+
+        positionByKey.set(position, point);
+        ipByPosition.get(position).push(point.ip);
         coordinates.push([point.latitude, point.longitude]);
-        var marker = new L.marker([point.latitude, point.longitude]);
-        marker.bindTooltip(point.ip, { permanent: true, className: "my-label", offset: [0, 0] });
-        marker.addTo(map);
     });
+
+    for(let position of ipByPosition.keys()) {
+        var point = positionByKey.get(position);
+        var marker = new L.marker([point.latitude, point.longitude]);
+
+        var ipsText = "";
+        ipByPosition.get(position).forEach(function (ip) {
+            ipsText += ip + "<br>";
+        });
+        marker.bindTooltip(ipsText, { permanent: true, className: "my-label", offset: [0, 0] });
+        marker.addTo(map);
+    }
 
     var arrow = L.polyline(coordinates, {}).addTo(map);
     var arrowHead = L.polylineDecorator(arrow, {
@@ -54,30 +74,34 @@ function drawPolyline(points) {
     map.fitBounds(arrow.getBounds());
 }
 
+function getPosition(point) {
+    return new pairKey(point.latitude, point.longitude).key;
+}
+
 function drawRandomLine() {
-    fetch('https://ipapi.co/json/')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    dataOk = data.location_list;
-                    console.log(dataOk)
-                    var tempArray = [];
-                    dataOk.forEach(function (arrayItem) {
-                        tempArray.push({
-                            ip: arrayItem.ip,
-                            latitude: arrayItem.location.latitude,
-                            longitude: arrayItem.location.longitude
-                        });
-                    });
-                    drawPolyline(tempArray);
-                });
-        });
+    // fetch('https://ipapi.co/json/')
+    //     .then(function (response) {
+    //         return response.json();
+    //     })
+    //     .then(function (data) {
+    //         fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
+    //             .then(function (response) {
+    //                 return response.json();
+    //             })
+    //             .then(function (data) {
+    //                 dataOk = data.location_list;
+    //                 console.log(dataOk)
+    //                 var tempArray = [];
+    //                 dataOk.forEach(function (arrayItem) {
+    //                     tempArray.push({
+    //                         ip: arrayItem.ip,
+    //                         latitude: arrayItem.location.latitude,
+    //                         longitude: arrayItem.location.longitude
+    //                     });
+    //                 });
+    //                 drawPolyline(tempArray);
+    //             });
+    //     });
 
 
 
@@ -95,7 +119,12 @@ function drawRandomLine() {
         {
             latitude: 47.65,
             longitude: 2.4,
-            ip: "192.168.1.0"
+            ip: "192.168.1.0000000"
+        },
+        {
+            latitude: 47.65,
+            longitude: 2.4,
+            ip: "81.12.321.9271"
         },
         {
             latitude: 47.4,
@@ -103,6 +132,8 @@ function drawRandomLine() {
             ip: "127.0.0.1"
         }
     ];
+
+    drawPolyline(points);
 
 }
 
@@ -132,3 +163,28 @@ function getIpAdress() {
             console.log(data.ip);
         });
 }
+
+class pairKey {
+    constructor(x_pos, y_pos) {
+      this._X = x_pos;
+      this._Y = y_pos;
+    }
+  
+    get latitude() {
+      return this._X;
+    }
+    set latitude(x_pos) {
+      this._X = x_pos;
+    }
+  
+    get longitude() {
+      return this._Y;
+    }
+    set longitude(y_pos) {
+      this._Y = y_pos;
+    }
+  
+    get key() {
+      return Symbol.for(`pairKey[${this.latitude}:${this.longitude}]`);
+    }
+  }
