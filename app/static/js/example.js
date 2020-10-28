@@ -79,29 +79,29 @@ function getPosition(point) {
 }
 
 function drawRandomLine() {
-    // fetch('https://ipapi.co/json/')
-    //     .then(function (response) {
-    //         return response.json();
-    //     })
-    //     .then(function (data) {
-    //         fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
-    //             .then(function (response) {
-    //                 return response.json();
-    //             })
-    //             .then(function (data) {
-    //                 dataOk = data.location_list;
-    //                 console.log(dataOk)
-    //                 var tempArray = [];
-    //                 dataOk.forEach(function (arrayItem) {
-    //                     tempArray.push({
-    //                         ip: arrayItem.ip,
-    //                         latitude: arrayItem.location.latitude,
-    //                         longitude: arrayItem.location.longitude
-    //                     });
-    //                 });
-    //                 drawPolyline(tempArray);
-    //             });
-    //     });
+    fetch('https://ipapi.co/json/')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    dataOk = data.location_list;
+                    console.log(dataOk)
+                    var tempArray = [];
+                    dataOk.forEach(function (arrayItem) {
+                        tempArray.push({
+                            ip: arrayItem.ip,
+                            latitude: arrayItem.location.latitude,
+                            longitude: arrayItem.location.longitude
+                        });
+                    });
+                    drawPolyline(tempArray);
+                });
+        });
 
 
 
@@ -133,7 +133,7 @@ function drawRandomLine() {
         }
     ];
 
-    drawPolyline(points);
+    // drawPolyline(points);
 
 }
 
