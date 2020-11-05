@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/") 
 def home_view(): 
-    return render_template('example.html')
+    return render_template('index.html')
 
 @app.route("/get_traceroute_ips", methods=["GET"])
 def get_traceroute_ips():
