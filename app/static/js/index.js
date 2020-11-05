@@ -79,7 +79,7 @@ function getPosition(point) {
 }
 
 function drawTrajectory() {
-    fetch('https://ipapi.co/json/')
+    fetch('https://api.ipify.org/?format=json')
         .then(function (response) {
             return response.json();
         })
