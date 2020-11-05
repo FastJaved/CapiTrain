@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template
+from firebase import firebase
 from scapy.all import *
 import requests
 app = Flask(__name__) 
@@ -35,6 +36,10 @@ def get_traceroute(ip):
         call = requests.get(url)
         if 'bogon' not in call.json() :
             location_list.append({"ip" : ips, "location" : {"longitude" : call.json()['loc'].split(',')[1], "latitude" : call.json()['loc'].split(',')[0], "city" : call.json()['city']}})
+
+    from firebase import firebase
+    firebase = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
+    result = firebase.post('/traceroute/', location_list)
 
     return jsonify({'location_list': location_list}), 200
 
