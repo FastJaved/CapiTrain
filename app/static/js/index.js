@@ -1,6 +1,7 @@
 ﻿var map;
 var greenIcon;
 var redIcon;
+var mainLayer = new L.LayerGroup();
 
 function init() {
     map = L.map('map', {
@@ -12,6 +13,8 @@ function init() {
             })
         ]
     });
+
+    mainLayer.addTo(map);
 
     greenIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -33,6 +36,8 @@ function init() {
 }
 
 function drawPolyline(points) {
+    mainLayer.clearLayers();
+
     var coordinates = [];
 
     var ipByPosition = new Map();
@@ -58,18 +63,20 @@ function drawPolyline(points) {
             ipsText += ip + "<br>";
         });
         marker.bindTooltip(ipsText, { permanent: true, className: "my-label", offset: [0, 0] });
-        marker.addTo(map);
+        mainLayer.addLayer(marker);
     }
 
-    var arrow = L.polyline(coordinates, {}).addTo(map);
+    var arrow = L.polyline(coordinates, {});
+    mainLayer.addLayer(arrow);
     var arrowHead = L.polylineDecorator(arrow, {
         patterns: [
             { offset: 25, repeat: 50, symbol: L.Symbol.arrowHead({ pixelSize: 15, pathOptions: { fillOpacity: 1, weight: 0 } }) }
         ]
-    }).addTo(map);
+    });
+    mainLayer.addLayer(arrowHead);
 
-    L.marker(coordinates.shift(), { icon: greenIcon }).addTo(map);
-    L.marker(coordinates.pop(), { icon: redIcon }).addTo(map);
+    mainLayer.addLayer(L.marker(coordinates.shift(), { icon: greenIcon }));
+    mainLayer.addLayer(L.marker(coordinates.pop(), { icon: redIcon }));
 
     map.fitBounds(arrow.getBounds());
 }
@@ -79,29 +86,29 @@ function getPosition(point) {
 }
 
 function drawTrajectory() {
-    fetch('https://api.ipify.org/?format=json')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    dataOk = data.location_list;
-                    console.log(dataOk)
-                    var tempArray = [];
-                    dataOk.forEach(function (arrayItem) {
-                        tempArray.push({
-                            ip: arrayItem.ip,
-                            latitude: arrayItem.location.latitude,
-                            longitude: arrayItem.location.longitude
-                        });
-                    });
-                    drawPolyline(tempArray);
-                });
-        });
+    // fetch('https://api.ipify.org/?format=json')
+    //     .then(function (response) {
+    //         return response.json();
+    //     })
+    //     .then(function (data) {
+    //         fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
+    //             .then(function (response) {
+    //                 return response.json();
+    //             })
+    //             .then(function (data) {
+    //                 dataOk = data.location_list;
+    //                 console.log(dataOk)
+    //                 var tempArray = [];
+    //                 dataOk.forEach(function (arrayItem) {
+    //                     tempArray.push({
+    //                         ip: arrayItem.ip,
+    //                         latitude: arrayItem.location.latitude,
+    //                         longitude: arrayItem.location.longitude
+    //                     });
+    //                 });
+    //                 drawPolyline(tempArray);
+    //             });
+    //     });
 
 
 
@@ -133,7 +140,7 @@ function drawTrajectory() {
         }
     ];
 
-    // drawPolyline(points);
+    drawPolyline(points);
 
 }
 
