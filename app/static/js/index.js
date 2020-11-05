@@ -78,7 +78,7 @@ function getPosition(point) {
     return new pairKey(point.latitude, point.longitude).key;
 }
 
-function drawRandomLine() {
+function drawTrajectory() {
     fetch('https://ipapi.co/json/')
         .then(function (response) {
             return response.json();
@@ -140,7 +140,7 @@ function drawRandomLine() {
 function traceroute() {
 
 
-    drawRandomLine()
+    drawTrajectory()
 
     console.log(getIpAdress())
 }
@@ -155,7 +155,7 @@ class Point {
 
 
 function getIpAdress() {
-    fetch('https://ipapi.co/json/')
+    fetch('https://api.ipify.org/?format=json')
         .then(function (response) {
             return response.json();
         })
