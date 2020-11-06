@@ -2,7 +2,7 @@
 
 This project is a web server made in Python with Flask that allows you to traceroute from the server to the client. It also displays the path on a map. <br>
 >Server : http://golmole.ddns.net:8000/ <br>
->API : http://golmole.ddns.net:8000/get_traceroute/ip
+>API : http://golmole.ddns.net:8000/get_traceroute/{IP_ADDRESS}
 ## Installation
 
 Use Docker to deploy the image on your server.
