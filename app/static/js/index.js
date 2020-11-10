@@ -88,9 +88,19 @@ function getPosition(point) {
 function drawTrajectory() {
     fetch('https://api.ipify.org/?format=json')
         .then(function (response) {
-            return response.json();
+            var ipValue = document.getElementById('ipTxt').value
+            if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipValue)) {
+                var data = {};
+                var data = {ip: ipValue};
+                return data;
+            }
+            else {
+                return response.json();
+            }
+           
         })
         .then(function (data) {
+            console.log("Traceroute to " + data.ip);
             fetch('http://golmole.ddns.net:8000/get_traceroute/' + data.ip)
                 .then(function (response) {
                     return response.json();
@@ -149,7 +159,7 @@ function traceroute() {
 
     drawTrajectory()
 
-    console.log(getIpAdress())
+    //console.log(getIpAdress())
 }
 
 class Point {
