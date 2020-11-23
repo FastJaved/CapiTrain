@@ -86,7 +86,8 @@ function drawPolyline(points) {
 function fillFilters() {
     fetch('http://golmole.ddns.net:8000/get_filters')
         .then(function (response) {
-            var cities = response.json().filters.cities
+            console.log(response)
+            var cities = response.filters.cities
 
             //cities
             var select_from = document.getElementById('from-city'),
