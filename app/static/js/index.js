@@ -4,6 +4,8 @@ var redIcon;
 var mainLayer = new L.LayerGroup();
 
 function init() {
+    fillFilters()
+
     map = L.map('map', {
         center: [52.0, -11.0],
         zoom: 5,
@@ -54,7 +56,7 @@ function drawPolyline(points) {
         coordinates.push([point.latitude, point.longitude]);
     });
 
-    for(let position of ipByPosition.keys()) {
+    for (let position of ipByPosition.keys()) {
         var point = positionByKey.get(position);
         var marker = new L.marker([point.latitude, point.longitude]);
 
@@ -79,6 +81,37 @@ function drawPolyline(points) {
     mainLayer.addLayer(L.marker(coordinates.pop(), { icon: redIcon }));
 
     map.fitBounds(arrow.getBounds());
+}
+
+function fillFilters() {
+    fetch('http://golmole.ddns.net:8000/get_filters')
+        .then(function (response) {
+            var cities = response.json().filters.cities
+
+            //cities
+            var select_from = document.getElementById('from-city'),
+                option,
+                i = 0,
+                il = cities.length;
+
+            for (; i < il; i += 1) {
+                option = document.createElement('option');
+                option.setAttribute('value', cities[i]);
+                option.appendChild(document.createTextNode(cities[i]));
+                select_from.appendChild(option);
+            }
+
+            var select_to = document.getElementById('to-city')
+            i = 0
+            il = cities.length
+
+            for (; i < il; i += 1) {
+                option = document.createElement('option');
+                option.setAttribute('value', cities[i]);
+                option.appendChild(document.createTextNode(cities[i]));
+                select_to.appendChild(option);
+            }
+        })
 }
 
 function getPosition(point) {
@@ -146,7 +179,7 @@ function drawTrajectory() {
         {
             latitude: 47.4,
             longitude: 2.5,
-            ip: "127.0.0.1"
+            ip: "129.0.0.1"
         }
     ];
 
@@ -155,7 +188,6 @@ function drawTrajectory() {
 }
 
 function traceroute() {
-
 
     drawTrajectory()
 
@@ -183,25 +215,25 @@ function getIpAdress() {
 
 class pairKey {
     constructor(x_pos, y_pos) {
-      this._X = x_pos;
-      this._Y = y_pos;
+        this._X = x_pos;
+        this._Y = y_pos;
     }
-  
+
     get latitude() {
-      return this._X;
+        return this._X;
     }
     set latitude(x_pos) {
-      this._X = x_pos;
+        this._X = x_pos;
     }
-  
+
     get longitude() {
-      return this._Y;
+        return this._Y;
     }
     set longitude(y_pos) {
-      this._Y = y_pos;
+        this._Y = y_pos;
     }
-  
+
     get key() {
-      return Symbol.for(`pairKey[${this.latitude}:${this.longitude}]`);
+        return Symbol.for(`pairKey[${this.latitude}:${this.longitude}]`);
     }
-  }
+}

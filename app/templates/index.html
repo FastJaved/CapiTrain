@@ -34,17 +34,41 @@
   <script src="../static/js/leaflet.polylineDecorator.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
 
+
   <script src="../static/js/index.js"></script>
 </head>
 
 <body onload="init();">
   <div class="top">
     <h1>CapiTrain</h1>
-    <p>Traceroute between points</p>
-    <p>Target:
-      <input type="text" id="ipTxt" size="20"><br>
-    </p>
-    <a class="btn-traceroute" onclick="traceroute()">Traceroute</a>
+    <br>
+    <br>
+
+    <div class="row">
+      <div class="column">
+        <h3>Traceroute between points</h3>
+        <p>Target:
+          <input type="text" id="ipTxt" size="20"><br>
+        </p>
+        <a class="btn-traceroute" onclick="traceroute()">Traceroute</a>
+      </div>
+      <div class="column">
+        <h3>Filter traceroutes</h3>
+        <p>Source:<br> 
+          City: <select name="city" id="from-city">
+            <option value="">--All--</option>
+          </select>
+        
+        </p>
+        <p>Target:<br>
+          City: <select name="city" id="to-city">
+            <option value="">--All--</option>
+          </select>
+        </p>
+        <a class="btn-traceroute" onclick="traceroute()">Show traceroutes</a>
+      </div>
+    </div> 
+
   </div>
   <div id="map">
   </div>
