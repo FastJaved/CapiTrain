@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request, render_template
+from flask_cors import CORS
 from firebase import firebase
 from scapy.all import *
 import requests
 import json
 app = Flask(__name__) 
+CORS(app)
 
 @app.route("/") 
 def home_view(): 
