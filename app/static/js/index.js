@@ -86,8 +86,10 @@ function drawPolyline(points) {
 function fillFilters() {
     fetch('http://golmole.ddns.net:8000/get_filters')
         .then(function (response) {
-            console.log(response.json())
-            var cities = response.filters.cities
+            return response.json()
+        })
+        .then(function (data) {
+            var cities = data.filters.cities
 
             //cities
             var select_from = document.getElementById('from-city'),
@@ -125,13 +127,13 @@ function drawTrajectory() {
             var ipValue = document.getElementById('ipTxt').value
             if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipValue)) {
                 var data = {};
-                var data = {ip: ipValue};
+                var data = { ip: ipValue };
                 return data;
             }
             else {
                 return response.json();
             }
-           
+
         })
         .then(function (data) {
             console.log("Traceroute to " + data.ip);
