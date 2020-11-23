@@ -90,30 +90,61 @@ function fillFilters() {
         })
         .then(function (data) {
             var cities = data.filters.cities
+            var providers = data.filters.providers
 
             //cities
-            var select_from = document.getElementById('from-city'),
-                option,
-                i = 0,
-                il = cities.length;
+            if (cities !== undefined) {
+                var select_from = document.getElementById('from-city'),
+                    option,
+                    i = 0,
+                    il = cities.length;
 
-            for (; i < il; i += 1) {
-                option = document.createElement('option');
-                option.setAttribute('value', cities[i]);
-                option.appendChild(document.createTextNode(cities[i]));
-                select_from.appendChild(option);
+                for (; i < il; i += 1) {
+                    option = document.createElement('option');
+                    option.setAttribute('value', cities[i]);
+                    option.appendChild(document.createTextNode(cities[i]));
+                    select_from.appendChild(option);
+                }
+
+                var select_to = document.getElementById('to-city')
+                i = 0
+                il = cities.length
+
+                for (; i < il; i += 1) {
+                    option = document.createElement('option');
+                    option.setAttribute('value', cities[i]);
+                    option.appendChild(document.createTextNode(cities[i]));
+                    select_to.appendChild(option);
+                }
             }
 
-            var select_to = document.getElementById('to-city')
-            i = 0
-            il = cities.length
 
-            for (; i < il; i += 1) {
-                option = document.createElement('option');
-                option.setAttribute('value', cities[i]);
-                option.appendChild(document.createTextNode(cities[i]));
-                select_to.appendChild(option);
+            //providers
+            if (providers !== undefined) {
+                var select_from = document.getElementById('from-provider'),
+                    option,
+                    i = 0,
+                    il = providers.length;
+
+                for (; i < il; i += 1) {
+                    option = document.createElement('option');
+                    option.setAttribute('value', providers[i]);
+                    option.appendChild(document.createTextNode(providers[i]));
+                    select_from.appendChild(option);
+                }
+
+                var select_to = document.getElementById('to-provider')
+                i = 0
+                il = providers.length
+
+                for (; i < il; i += 1) {
+                    option = document.createElement('option');
+                    option.setAttribute('value', providers[i]);
+                    option.appendChild(document.createTextNode(providers[i]));
+                    select_to.appendChild(option);
+                }
             }
+
         })
 }
 
