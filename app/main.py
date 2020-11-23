@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, render_template
 from firebase import firebase
 from scapy.all import *
 import requests
+import json
 app = Flask(__name__) 
 
 @app.route("/") 
@@ -37,11 +38,31 @@ def get_traceroute(ip):
         if 'bogon' not in call.json() :
             location_list.append({"ip" : ips, "location" : {"longitude" : call.json()['loc'].split(',')[1], "latitude" : call.json()['loc'].split(',')[0], "city" : call.json()['city']}})
 
-    from firebase import firebase
-    firebase = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
-    result = firebase.post('/traceroute/', location_list)
+    db = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
+    result = db.post('/traceroute/', location_list)
 
     return jsonify({'location_list': location_list}), 200
+
+@app.route("/get_filters", methods=["GET"])
+def get_filters():
+    db = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
+    result = db.get('/traceroute', None)
+
+    cities = set()
+
+    for traceroute in result:
+        from_city = result[traceroute][0]['location']['city']
+        to_city = result[traceroute][-1]['location']['city']
+
+        cities.add(from_city.encode().decode('unicode_escape'))
+        cities.add(to_city.encode().decode('unicode_escape'))
+
+    print(cities)
+
+    filters_object = {}
+    filters_object['cities'] = list(cities)
+
+    return jsonify({'filters': filters_object}), 200
 
 if __name__ == "__main__":
     # Only for debugging while developing
