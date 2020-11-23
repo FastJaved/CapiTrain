@@ -63,9 +63,9 @@ def get_filters():
         cities.add(from_city.encode().decode('unicode_escape'))
         cities.add(to_city.encode().decode('unicode_escape'))
 
-        if not from_provider
+        if not from_provider:
             providers.add(from_provider.encode().decode('unicode_escape'))
-        if not to_provider
+        if not to_provider:
             providers.add(to_provider.encode().decode('unicode_escape'))
 
     filters_object = {}
