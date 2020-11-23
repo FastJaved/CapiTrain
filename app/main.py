@@ -57,15 +57,15 @@ def get_filters():
         from_city = result[traceroute][0]['location']['city']
         to_city = result[traceroute][-1]['location']['city']
 
-        from_provider = result[traceroute][0]['provider']
-        to_provider = result[traceroute][-1]['provider']
+        from_provider = result[traceroute][0].get('provider', "")
+        to_provider = result[traceroute][-1].get('provider', "")
 
         cities.add(from_city.encode().decode('unicode_escape'))
         cities.add(to_city.encode().decode('unicode_escape'))
 
-        if not from_provider:
+        if from_provider:
             providers.add(from_provider.encode().decode('unicode_escape'))
-        if not to_provider:
+        if to_provider:
             providers.add(to_provider.encode().decode('unicode_escape'))
 
     filters_object = {}
