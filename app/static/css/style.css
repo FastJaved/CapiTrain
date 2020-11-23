@@ -9,6 +9,14 @@ h1 {
 	line-height: 58px;
 }
 
+h3 {
+	font-family: 'Lato', sans-serif;
+}
+
+h4 {
+	font-family: 'Lato', sans-serif;
+}
+
 p {
 	color: #adb7bd;
 	font-family: 'Lucida Sans', Arial, sans-serif;
