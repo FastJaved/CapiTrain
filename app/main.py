@@ -38,7 +38,7 @@ def get_traceroute(ip):
         #url = "http://ipwhois.app/json/" + ip
         call = requests.get(url)
         if 'bogon' not in call.json() :
-            location_list.append({"ip" : ips, "location" : {"longitude" : call.json()['loc'].split(',')[1], "latitude" : call.json()['loc'].split(',')[0], "city" : call.json()['city']}})
+            location_list.append({"ip" : ips, "provider": call.json().get('org', ''), "location" : {"longitude" : call.json()['loc'].split(',')[1], "latitude" : call.json()['loc'].split(',')[0], "city" : call.json()['city']}})
 
     db = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
     result = db.post('/traceroute/', location_list)
