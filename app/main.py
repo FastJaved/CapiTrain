@@ -50,8 +50,10 @@ def get_filters():
     db = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
     result = db.get('/traceroute', None)
 
-    cities = set()
-    providers = set()
+    from_cities = set()
+    to_cities = set()
+    from_providers = set()
+    to_providers = set()
 
     for traceroute in result:
         from_city = result[traceroute][0]['location']['city']
@@ -60,17 +62,19 @@ def get_filters():
         from_provider = result[traceroute][0].get('provider', "")
         to_provider = result[traceroute][-1].get('provider', "")
 
-        cities.add(from_city.encode().decode('unicode_escape'))
-        cities.add(to_city.encode().decode('unicode_escape'))
+        from_cities.add(from_city.encode().decode('unicode_escape'))
+        to_cities.add(to_city.encode().decode('unicode_escape'))
 
         if from_provider:
-            providers.add(from_provider.encode().decode('unicode_escape'))
+            from_providers.add(from_provider.encode().decode('unicode_escape'))
         if to_provider:
-            providers.add(to_provider.encode().decode('unicode_escape'))
+            to_providers.add(to_provider.encode().decode('unicode_escape'))
 
     filters_object = {}
-    filters_object['cities'] = list(cities)
-    filters_object['providers'] = list(providers)
+    filters_object['from_cities'] = list(from_cities)
+    filters_object['to_cities'] = list(to_cities)
+    filters_object['from_providers'] = list(from_providers)
+    filters_object['to_providers'] = list(to_providers)
 
     return jsonify({'filters': filters_object}), 200
 

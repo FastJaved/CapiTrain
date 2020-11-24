@@ -87,62 +87,68 @@ function fillFilters() {
             return response.json()
         })
         .then(function (data) {
-            var cities = data.filters.cities
-            var providers = data.filters.providers
+            var from_cities = data.filters.from_cities
+            var to_cities = data.filters.to_cities
+            var from_providers = data.filters.from_providers
+            var to_providers = data.filters.to_providers
 
             //cities
-            if (cities !== undefined) {
+            if (from_cities !== undefined) {
                 var select_from = document.getElementById('from-city'),
                     option,
                     i = 0,
-                    il = cities.length;
+                    il = from_cities.length;
 
                 for (; i < il; i += 1) {
                     option = document.createElement('option');
-                    option.setAttribute('value', cities[i]);
-                    option.appendChild(document.createTextNode(cities[i]));
+                    option.setAttribute('value', from_cities[i]);
+                    option.appendChild(document.createTextNode(from_cities[i]));
                     select_from.appendChild(option);
                 }
+            }
 
-                var select_to = document.getElementById('to-city')
-                i = 0
-                il = cities.length
+            if (to_cities !== undefined) {
+                var select_to = document.getElementById('to-city'),
+                option,
+                i = 0,
+                il = to_cities.length
 
                 for (; i < il; i += 1) {
                     option = document.createElement('option');
-                    option.setAttribute('value', cities[i]);
-                    option.appendChild(document.createTextNode(cities[i]));
+                    option.setAttribute('value', to_cities[i]);
+                    option.appendChild(document.createTextNode(to_cities[i]));
                     select_to.appendChild(option);
                 }
             }
 
 
             //providers
-            if (providers !== undefined) {
+            if (from_providers !== undefined) {
                 var select_from = document.getElementById('from-provider'),
                     option,
                     i = 0,
-                    il = providers.length;
+                    il = from_providers.length;
 
                 for (; i < il; i += 1) {
                     option = document.createElement('option');
-                    option.setAttribute('value', providers[i]);
-                    option.appendChild(document.createTextNode(providers[i]));
+                    option.setAttribute('value', from_providers[i]);
+                    option.appendChild(document.createTextNode(from_providers[i]));
                     select_from.appendChild(option);
-                }
-
-                var select_to = document.getElementById('to-provider')
-                i = 0
-                il = providers.length
-
-                for (; i < il; i += 1) {
-                    option = document.createElement('option');
-                    option.setAttribute('value', providers[i]);
-                    option.appendChild(document.createTextNode(providers[i]));
-                    select_to.appendChild(option);
                 }
             }
 
+            if (to_providers !== undefined) {
+                var select_to = document.getElementById('to-provider')
+                i = 0
+                il = to_providers.length
+
+                for (; i < il; i += 1) {
+                    option = document.createElement('option');
+                    option.setAttribute('value', to_providers[i]);
+                    option.appendChild(document.createTextNode(to_providers[i]));
+                    select_to.appendChild(option);
+                }
+            }
         })
 }
 
@@ -185,6 +191,10 @@ function showTraceroutes() {
             traceroutes.forEach(function (traceroute) {
                 drawPolyline(traceroute)
             })
+
+            if(traceroutes.length == 0) {
+                window.alert("No traceroute found!");
+            }
         })
 }
 
@@ -276,6 +286,7 @@ function drawTrajectory() {
 }
 
 function traceroute() {
+
     drawTrajectory()
 }
 
