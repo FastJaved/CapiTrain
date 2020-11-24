@@ -53,12 +53,12 @@ function drawPolyline(points) {
 
         positionByKey.set(position, point);
         ipByPosition.get(position).push(point.ip);
-        coordinates.push([point.latitude, point.longitude]);
+        coordinates.push([point.location.latitude, point.location.longitude]);
     });
 
     for (let position of ipByPosition.keys()) {
         var point = positionByKey.get(position);
-        var marker = new L.marker([point.latitude, point.longitude]);
+        var marker = new L.marker([point.location.latitude, point.location.longitude]);
 
         var ipsText = "";
         ipByPosition.get(position).forEach(function (ip) {
@@ -159,16 +159,34 @@ function showTraceroutes() {
     var from_provider = select_from_provider.value
     var to_provider = select_to_provider.value
 
-    console.log(from_city)
-    console.log(to_city)
-    console.log(from_provider)
-    console.log(to_provider)
+    var parameters = "?"
 
+    if(from_city) {
+        parameters += "from_city=" + from_city
+    }
+    if(from_provider) {
+        parameters += "&from_provider=" + from_provider
+    }
+    if(to_city) {
+        parameters += "&to_city=" + to_city
+    }
+    if(to_provider) {
+        parameters += "&to_provider=" + to_provider
+    }
 
+    console.log(parameters)
+
+    fetch('http://golmole.ddns.net:8000/get_traceroutes' + parameters)
+        .then(function (response) {
+            return response.json()
+        })
+        .then(function (traceroutes) {
+            console.log(traceroutes)
+        })
 }
 
 function getPosition(point) {
-    return new pairKey(point.latitude, point.longitude).key;
+    return new pairKey(point.location.latitude, point.location.longitude).key;
 }
 
 function drawTrajectory() {
@@ -195,14 +213,16 @@ function drawTrajectory() {
                     dataOk = data.location_list;
                     console.log(dataOk)
                     var tempArray = [];
-                    dataOk.forEach(function (arrayItem) {
+                    /*dataOk.forEach(function (arrayItem) {
+                        console.log(arrayItem)
                         tempArray.push({
                             ip: arrayItem.ip,
                             latitude: arrayItem.location.latitude,
                             longitude: arrayItem.location.longitude
                         });
-                    });
-                    drawPolyline(tempArray);
+
+                    });*/
+                    drawPolyline(dataOk);
                 });
         });
 
@@ -246,15 +266,6 @@ function traceroute() {
 
     //console.log(getIpAdress())
 }
-
-class Point {
-    constructor(longitude, latitude, ip) {
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.ip = ip;
-    }
-}
-
 
 function getIpAdress() {
     fetch('https://api.ipify.org/?format=json')
