@@ -148,6 +148,25 @@ function fillFilters() {
         })
 }
 
+function showTraceroutes() {
+    var select_from_city = document.getElementById('from-city')
+    var select_to_city = document.getElementById('to-city')
+    var select_from_provider = document.getElementById('from-provider')
+    var select_to_provider = document.getElementById('to-provider')
+
+    var from_city = select_from_city.value
+    var to_city = select_to_city.value
+    var from_provider = select_from_provider.value
+    var to_provider = select_to_provider.value
+
+    console.log(from_city)
+    console.log(to_city)
+    console.log(from_provider)
+    console.log(to_provider)
+
+
+}
+
 function getPosition(point) {
     return new pairKey(point.latitude, point.longitude).key;
 }
