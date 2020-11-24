@@ -74,6 +74,40 @@ def get_filters():
 
     return jsonify({'filters': filters_object}), 200
 
+@app.route("/get_traceroutes", methods=["GET"])
+def get_traceroutes():
+    db = firebase.FirebaseApplication('https://capitrain.firebaseio.com/', None)
+    result = db.get('/traceroute', None)
+
+    from flask import request
+
+    from_city_filter = request.args.get("from_city", "")
+    to_city_filter = request.args.get("to_city", "")
+    from_provider_filter = request.args.get("from_provider", "")
+    to_provider_filter = request.args.get("to_provider", "")
+
+    traceroutes = list()
+
+    for traceroute in result:
+        from_city = result[traceroute][0]['location']['city']
+        to_city = result[traceroute][-1]['location']['city']
+
+        from_provider = result[traceroute][0].get('provider', "")
+        to_provider = result[traceroute][-1].get('provider', "")
+
+        if from_city_filter and from_city != from_city_filter:
+            continue
+        if to_city_filter and to_city != to_city_filter:
+            continue
+        if from_provider_filter and from_provider != from_provider_filter:
+            continue
+        if to_provider_filter and to_provider != to_provider_filter:
+            continue
+        
+        traceroutes.append(result[traceroute])
+
+    return jsonify({'traceroutes': traceroutes}), 200
+
 if __name__ == "__main__":
     # Only for debugging while developing
     app.run(host='0.0.0.0', port=80)
