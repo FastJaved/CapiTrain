@@ -38,8 +38,6 @@ function init() {
 }
 
 function drawPolyline(points) {
-    mainLayer.clearLayers();
-
     var coordinates = [];
 
     var ipByPosition = new Map();
@@ -149,6 +147,8 @@ function fillFilters() {
 }
 
 function showTraceroutes() {
+    mainLayer.clearLayers();
+
     var select_from_city = document.getElementById('from-city')
     var select_to_city = document.getElementById('to-city')
     var select_from_provider = document.getElementById('from-provider')
@@ -161,16 +161,16 @@ function showTraceroutes() {
 
     var parameters = "?"
 
-    if(from_city) {
+    if (from_city) {
         parameters += "from_city=" + from_city
     }
-    if(from_provider) {
+    if (from_provider) {
         parameters += "&from_provider=" + from_provider
     }
-    if(to_city) {
+    if (to_city) {
         parameters += "&to_city=" + to_city
     }
-    if(to_provider) {
+    if (to_provider) {
         parameters += "&to_provider=" + to_provider
     }
 
@@ -180,8 +180,11 @@ function showTraceroutes() {
         .then(function (response) {
             return response.json()
         })
-        .then(function (traceroutes) {
-            console.log(traceroutes)
+        .then(function (data) {
+            var traceroutes = data.traceroutes
+            traceroutes.forEach(function (traceroute) {
+                drawPolyline(traceroute)
+            })
         })
 }
 
@@ -190,6 +193,8 @@ function getPosition(point) {
 }
 
 function drawTrajectory() {
+    mainLayer.clearLayers();
+
     fetch('https://api.ipify.org/?format=json')
         .then(function (response) {
             var ipValue = document.getElementById('ipTxt').value
@@ -213,7 +218,7 @@ function drawTrajectory() {
                     dataOk = data.location_list;
                     console.log(dataOk)
                     var tempArray = [];
-                    /*dataOk.forEach(function (arrayItem) {
+                    dataOk.forEach(function (arrayItem) {
                         console.log(arrayItem)
                         tempArray.push({
                             ip: arrayItem.ip,
@@ -221,7 +226,7 @@ function drawTrajectory() {
                             longitude: arrayItem.location.longitude
                         });
 
-                    });*/
+                    });
                     drawPolyline(dataOk);
                 });
         });
@@ -230,28 +235,38 @@ function drawTrajectory() {
 
     var points = [
         {
-            latitude: 48,
-            longitude: 2,
+            location: {
+                latitude: 48,
+                longitude: 2
+            },
             ip: "142.234.21.21"
         },
         {
-            latitude: 47.7,
-            longitude: 2.1,
+            location: {
+                latitude: 47.7,
+                longitude: 2.1
+            },
             ip: "191.1.0.3"
         },
         {
-            latitude: 47.65,
-            longitude: 2.4,
+            location: {
+                latitude: 47.65,
+                longitude: 2.4
+            },
             ip: "192.168.1.0000000"
         },
         {
-            latitude: 47.65,
-            longitude: 2.4,
+            location: {
+                latitude: 47.65,
+                longitude: 2.4
+            },
             ip: "81.12.321.9271"
         },
         {
-            latitude: 47.4,
-            longitude: 2.5,
+            location: {
+                latitude: 47.4,
+                longitude: 2.5
+            },
             ip: "129.0.0.1"
         }
     ];
@@ -261,10 +276,7 @@ function drawTrajectory() {
 }
 
 function traceroute() {
-
     drawTrajectory()
-
-    //console.log(getIpAdress())
 }
 
 function getIpAdress() {
