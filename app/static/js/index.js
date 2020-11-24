@@ -2,6 +2,7 @@
 var greenIcon;
 var redIcon;
 var mainLayer = new L.LayerGroup();
+var alreadyPresentMarkers = new Set();
 
 function init() {
     fillFilters()
@@ -37,7 +38,7 @@ function init() {
     });
 }
 
-function drawPolyline(points) {
+function drawPolyline(points, showIps = true) {
     var coordinates = [];
 
     var ipByPosition = new Map();
@@ -45,12 +46,18 @@ function drawPolyline(points) {
 
     points.forEach(function (point) {
         position = getPosition(point);
-        if (!ipByPosition.has(position)) {
-            ipByPosition.set(position, []);
+
+        console.log(alreadyPresentMarkers.has(position))
+        if (!alreadyPresentMarkers.has(position)) {
+            alreadyPresentMarkers.add(position)
+            if (!ipByPosition.has(position)) {
+                ipByPosition.set(position, []);
+            }
+
+            positionByKey.set(position, point);
+            ipByPosition.get(position).push(point.ip);
         }
 
-        positionByKey.set(position, point);
-        ipByPosition.get(position).push(point.ip);
         coordinates.push([point.location.latitude, point.location.longitude]);
     });
 
@@ -58,11 +65,14 @@ function drawPolyline(points) {
         var point = positionByKey.get(position);
         var marker = new L.marker([point.location.latitude, point.location.longitude]);
 
-        var ipsText = "";
-        ipByPosition.get(position).forEach(function (ip) {
-            ipsText += ip + "<br>";
-        });
-        marker.bindTooltip(ipsText, { permanent: true, className: "my-label", offset: [0, 0] });
+        if (showIps) {
+            var ipsText = "";
+            ipByPosition.get(position).forEach(function (ip) {
+                ipsText += ip + "<br>";
+            });
+            marker.bindTooltip(ipsText, { permanent: true, className: "my-label", offset: [0, 0] });
+        }
+
         mainLayer.addLayer(marker);
     }
 
@@ -109,9 +119,9 @@ function fillFilters() {
 
             if (to_cities !== undefined) {
                 var select_to = document.getElementById('to-city'),
-                option,
-                i = 0,
-                il = to_cities.length
+                    option,
+                    i = 0,
+                    il = to_cities.length
 
                 for (; i < il; i += 1) {
                     option = document.createElement('option');
@@ -153,7 +163,7 @@ function fillFilters() {
 }
 
 function showTraceroutes() {
-    mainLayer.clearLayers();
+    resetMap()
 
     var select_from_city = document.getElementById('from-city')
     var select_to_city = document.getElementById('to-city')
@@ -180,8 +190,6 @@ function showTraceroutes() {
         parameters += "&to_provider=" + to_provider
     }
 
-    console.log(parameters)
-
     fetch('http://golmole.ddns.net:8000/get_traceroutes' + parameters)
         .then(function (response) {
             return response.json()
@@ -189,21 +197,26 @@ function showTraceroutes() {
         .then(function (data) {
             var traceroutes = data.traceroutes
             traceroutes.forEach(function (traceroute) {
-                drawPolyline(traceroute)
+                drawPolyline(traceroute, false)
             })
 
-            if(traceroutes.length == 0) {
+            if (traceroutes.length == 0) {
                 window.alert("No traceroute found!");
             }
         })
+}
+
+function resetMap() {
+    mainLayer.clearLayers();
+    alreadyPresentMarkers = new Set()
 }
 
 function getPosition(point) {
     return new pairKey(point.location.latitude, point.location.longitude).key;
 }
 
-function drawTrajectory() {
-    mainLayer.clearLayers();
+function drawSingleTraceroute() {
+    resetMap()
 
     fetch('https://api.ipify.org/?format=json')
         .then(function (response) {
@@ -287,7 +300,7 @@ function drawTrajectory() {
 
 function traceroute() {
 
-    drawTrajectory()
+    drawSingleTraceroute()
 }
 
 function getIpAdress() {
