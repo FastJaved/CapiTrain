@@ -38,6 +38,83 @@ function init() {
     });
 }
 
+function drawMultipleTraceroutes(traceroutes) {
+    var sources = new Map()
+    var targets = new Map()
+    var pointsByKey = new Map()
+    var linesFromKey = new Map()
+
+    traceroutes.forEach(function (traceroute) {
+        if (traceroute.length >= 1) {
+            sources.set(getPointKey(traceroute[0], traceroute[0]))
+            targets.set(getPointKey(traceroute[traceroute.length - 1], traceroute[traceroute.length - 1]))
+
+            var i = 0
+            var il = traceroute.length
+
+            for (; i < il; i += 1) {
+                var key = getPointKey(traceroute[i])
+                if (i < il - 1) {
+                    if (!linesFromKey.has(key)) {
+                        linesFromKey.set(key, new Set())
+                    }
+                    var nextKey = getPointKey(traceroute[i + 1])
+                    if(nextKey != key) {
+                        linesFromKey.get(key).add(nextKey)
+                    }
+                }
+
+                pointsByKey.set(key, traceroute[i])
+            }
+        }
+    })
+
+    for (let key of pointsByKey.keys()) {
+        if(!sources.has(key) && !targets.has(key)) {
+            var point = pointsByKey.get(key);
+            var marker = new L.marker([point.location.latitude, point.location.longitude]);
+
+            mainLayer.addLayer(marker);
+        }
+    }
+
+    for (let key of targets.keys()) {
+        if(!sources.has(key)) {
+            var point = pointsByKey.get(key);
+            var marker = new L.marker([point.location.latitude, point.location.longitude], { icon: redIcon });
+
+            mainLayer.addLayer(marker);
+        }
+    }
+
+    for (let key of sources.keys()) {
+        var point = pointsByKey.get(key);
+        var marker = new L.marker([point.location.latitude, point.location.longitude], { icon: greenIcon });
+
+        mainLayer.addLayer(marker);
+    }
+
+    for(let key of linesFromKey.keys()) {
+        for(let destinationKey of linesFromKey.get(key)) {
+            var origin = pointsByKey.get(key)
+            var destination = pointsByKey.get(destinationKey)
+
+            var coordinates = []
+            coordinates.push([origin.location.latitude, origin.location.longitude])
+            coordinates.push([destination.location.latitude, destination.location.longitude])
+
+            var arrow = L.polyline(coordinates, {});
+            mainLayer.addLayer(arrow);
+            var arrowHead = L.polylineDecorator(arrow, {
+                patterns: [
+                    { offset: 25, repeat: 50, symbol: L.Symbol.arrowHead({ pixelSize: 15, pathOptions: { fillOpacity: 1, weight: 0 } }) }
+                ]
+            });
+            mainLayer.addLayer(arrowHead);
+        }
+    }
+}
+
 function drawPolyline(points, showIps = true) {
     var coordinates = [];
 
@@ -45,9 +122,8 @@ function drawPolyline(points, showIps = true) {
     var positionByKey = new Map();
 
     points.forEach(function (point) {
-        position = getPosition(point);
+        position = getPointKey(point);
 
-        console.log(alreadyPresentMarkers.has(position))
         if (!alreadyPresentMarkers.has(position)) {
             alreadyPresentMarkers.add(position)
             if (!ipByPosition.has(position)) {
@@ -196,9 +272,7 @@ function showTraceroutes() {
         })
         .then(function (data) {
             var traceroutes = data.traceroutes
-            traceroutes.forEach(function (traceroute) {
-                drawPolyline(traceroute, false)
-            })
+            drawMultipleTraceroutes(traceroutes)
 
             if (traceroutes.length == 0) {
                 window.alert("No traceroute found!");
@@ -211,7 +285,7 @@ function resetMap() {
     alreadyPresentMarkers = new Set()
 }
 
-function getPosition(point) {
+function getPointKey(point) {
     return new pairKey(point.location.latitude, point.location.longitude).key;
 }
 
@@ -239,10 +313,8 @@ function drawSingleTraceroute() {
                 })
                 .then(function (data) {
                     dataOk = data.location_list;
-                    console.log(dataOk)
                     var tempArray = [];
                     dataOk.forEach(function (arrayItem) {
-                        console.log(arrayItem)
                         tempArray.push({
                             ip: arrayItem.ip,
                             latitude: arrayItem.location.latitude,
